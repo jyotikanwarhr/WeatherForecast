@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 
+
 // TODO: Define a City class with name and id properties
 class City {
   name: string;
@@ -14,7 +15,10 @@ class City {
 class HistoryService {
   // TODO: Define a read method that reads from the searchHistory.json file
   private async read() {
-    return await fs.readFile('db/db.json', 'utf8');
+    return await fs.readFile('db/db.json', {
+      flag: 'a+',
+      encoding: 'utf8',
+    });
   }
   // TODO: Define a write method that writes the updated cities array to the searchHistory.json file
   private async write(cities: City[]) {
@@ -36,7 +40,7 @@ class HistoryService {
   // * BONUS TODO: Define a removeCity method that removes a city from the searchHistory.json file
   async removeCity(id: string) {
     const cities = await this.getCities();
-    const index = cities.findIndex((city) => city.id === id);
+    const index = cities.findIndex((city: City) => city.id === id);
     if (index === -1) {
       throw new Error('City not found');
     }

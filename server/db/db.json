@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "1"
+  },
+  {
+    "id": "2"
+  },
+  {
+    "name": "los angeles",
+    "id": "3"
+  },
+  {
+    "name": "Dallas",
+    "id": "4"
+  },
+  {
+    "name": "San Jose",
+    "id": "5"
+  },
+  {
+    "name": "New York",
+    "id": "6"
+  },
+  {
+    "name": "Fremont",
+    "id": "7"
+  },
+  {
+    "name": "San Francisco",
+    "id": "8"
+  }
+]
