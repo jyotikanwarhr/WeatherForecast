@@ -42,7 +42,7 @@ description, screenshot, and deployment link.
 
 Links
 
-GitHub Repository: [Repository URL]
+GitHub Repository: https://github.com/jyotikanwarhr/WeatherForecast
 
 Live Deployment: http://localhost:3002/
 
