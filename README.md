@@ -40,7 +40,7 @@ DELETE /api/weather/history/:id (Bonus) - Deletes a city from the search history
 
 description, screenshot, and deployment link.
 
-Links
+## Links
 
 GitHub Repository: https://github.com/jyotikanwarhr/WeatherForecast
 
