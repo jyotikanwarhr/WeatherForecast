@@ -1,3 +1,4 @@
+import dayjs, { type Dayjs} from 'dayjs'
 import dotenv from 'dotenv';
 // import dayjs,{type Dayjs} from 'dayjs';
 dotenv.config();
@@ -12,8 +13,8 @@ interface Coordinates {
 }
 // TODO: Define a class for the Weather object
 class Weather {
-  // city: string;
-  // date: Dayjs | string;
+  city: string;
+  date: Dayjs | string;
   tempF: number;
   feelsLike: number;
   humidity: number;
@@ -22,8 +23,8 @@ class Weather {
   iconDescription: string;
   constructor(
 
-    // city: string,
-    // date: Dayjs | string,
+    city: string,
+    date: Dayjs | string,
     tempF: number,
     feelsLike: number,
     humidity: number,
@@ -32,8 +33,8 @@ class Weather {
     icon: string
   ) {
    
-    // this.city = city;
-    // this.date = date;
+    this.city = city;
+    this.date = date;
     this.tempF = tempF;
     this.feelsLike = feelsLike;
     this.humidity = humidity;
@@ -109,16 +110,19 @@ class WeatherService {
     const query = this.buildWeatherQuery(coordinates);
     // console.log("Line 102 Fetch weather data", query);
     const response = await fetch(query)
-    // console.log("Line 104", response);
-    const data = await response.json();
+    
+     const data = await response.json();
+     console.log("Line 114", data);
     return data;
    }
   // TODO: Build parseCurrentWeather method
    private parseCurrentWeather(response: any) {
-    // console.log("Line 111", response);
-    const { tempF, feelsLike, humidity, windSpeed } = response.main;
-    const { iconDescription, icon } = response.weather[0];
-    return new Weather(tempF, feelsLike, humidity, iconDescription, icon, windSpeed);
+    console.log("Line 111", response);
+     const { temp, feels_like, humidity } = response.main;
+    const { dt } = response.dt;
+      const { speed } = response.wind;
+      const { iconDescription, icon } = response.weather[0];
+    return new Weather( this.cityName, dayjs.unix(dt).format('M/D/YYYY'),temp, feels_like, humidity, speed, iconDescription, icon );
    }
 
   //  city: string;
@@ -131,24 +135,24 @@ class WeatherService {
   // iconDescription: string;
   // TODO: Complete buildForecastArray method
    private buildForecastArray(currentWeather: Weather, weatherData: any) {
-    // console.log("Line 119", weatherData);
     const forecastArray: Weather[] = [currentWeather];
     for (let i = 1; i < 6; i++) {
-      const { tempF, feelsLike, humidity, windSpeed } = weatherData.main;
+      const { temp, feels_like, humidity } = weatherData.main;
+      const { dt } = weatherData.dt;
+      console.log("THIS IS THE DATE", dayjs.unix(dt).format('M/D/YYYY'))
+      const { speed } = weatherData.wind;
       const { iconDescription, icon } = weatherData.weather[0];
-      const weather = new Weather(tempF, feelsLike, humidity, iconDescription, icon, windSpeed);
+      const weather = new Weather(this.cityName, dayjs.unix(dt).format('M/D/YYYY'), temp, feels_like, humidity, speed , iconDescription, icon );
       forecastArray.push(weather);
     }
     return forecastArray;
    }
   // TODO: Complete getWeatherForCity method
    async getWeatherForCity(city: string) {
-    console.log(city);
     this.cityName = city;
     const coordinates = await this.fetchAndDestructureLocationData();
     const weatherData = await this.fetchWeatherData(coordinates);
-    console.log("Line 150", weatherData);
-    const currentWeather = this.parseCurrentWeather(weatherData);
+      const currentWeather = this.parseCurrentWeather(weatherData);
     console.log("Line 134", currentWeather);
     const forecastArray = this.buildForecastArray(currentWeather, weatherData);
     return forecastArray;
