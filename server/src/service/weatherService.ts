@@ -122,7 +122,7 @@ class WeatherService {
     const { dt } = response.dt;
       const { speed } = response.wind;
       const { iconDescription, icon } = response.weather[0];
-    return new Weather( this.cityName, dayjs.unix(dt).format('M/D/YYYY'),temp, feels_like, humidity, speed, iconDescription, icon );
+    return new Weather( this.cityName, dayjs(dt).format('M/D/YYYY'),temp, feels_like, humidity, speed, iconDescription, icon );
    }
 
   //  city: string;
@@ -134,27 +134,47 @@ class WeatherService {
   // icon: string;
   // iconDescription: string;
   // TODO: Complete buildForecastArray method
-   private buildForecastArray(currentWeather: Weather, weatherData: any) {
+   private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
     const forecastArray: Weather[] = [currentWeather];
-    for (let i = 1; i < 6; i++) {
-      const { temp, feels_like, humidity } = weatherData.main;
-      const { dt } = weatherData.dt;
-      console.log("THIS IS THE DATE", dayjs.unix(dt).format('M/D/YYYY'))
-      const { speed } = weatherData.wind;
-      const { iconDescription, icon } = weatherData.weather[0];
-      const weather = new Weather(this.cityName, dayjs.unix(dt).format('M/D/YYYY'), temp, feels_like, humidity, speed , iconDescription, icon );
+    for (let i = 0; i < weatherData.length; i++) {
+      const { temp, feels_like, humidity } = weatherData[i].main;
+      const dt  = weatherData[i].dt;
+      console.log("THIS IS THE DATE", dayjs(dt * 1000).format('M/D/YYYY'))
+      console.log(dt)
+      const { speed } = weatherData[i].wind;
+      const { iconDescription, icon } = weatherData[i].weather[0];
+      const weather = new Weather(this.cityName, dayjs(dt * 1000).format('M/D/YYYY'), temp, feels_like, humidity, speed , iconDescription, icon );
       forecastArray.push(weather);
     }
     return forecastArray;
    }
+
+   async fetchForecastData(coordinates: Coordinates) {
+    const query = `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=imperial`;
+    const response = await fetch(query);
+    const data = await response.json();
+    console.log("Line 134", data);
+
+    const filteredData = data.list.filter((weather:any) => {
+      return weather.dt_txt.includes("09:00:00")
+    })
+
+    return filteredData;
+   }
+
   // TODO: Complete getWeatherForCity method
    async getWeatherForCity(city: string) {
     this.cityName = city;
     const coordinates = await this.fetchAndDestructureLocationData();
     const weatherData = await this.fetchWeatherData(coordinates);
       const currentWeather = this.parseCurrentWeather(weatherData);
-    console.log("Line 134", currentWeather);
-    const forecastArray = this.buildForecastArray(currentWeather, weatherData);
+    // console.log("Line 134", currentWeather);
+
+    const forecastData = await this.fetchForecastData(coordinates)
+
+    // console.log(forecastData)
+
+    const forecastArray = this.buildForecastArray(currentWeather, forecastData);
     return forecastArray;
    }
 }
